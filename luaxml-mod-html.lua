@@ -6,16 +6,16 @@
 -- but then redone using https://html.spec.whatwg.org/multipage/parsing.html
 --
 -- There main purpose of this module is to create an useful DOM for later processing
--- using LuaXML functions. Either for cleanup, or for translation to output formats, 
--- for example LaTeX. 
+-- using LuaXML functions. Either for cleanup, or for translation to output formats,
+-- for example LaTeX.
 --
--- It should be possible to serialize DOM back to the original HTML code. 
+-- It should be possible to serialize DOM back to the original HTML code.
 --
--- We attempt to do some basic fixes, like to close paragraphs or list items that 
--- aren't closed correctly in the original code. We don't fix tables or 
+-- We attempt to do some basic fixes, like to close paragraphs or list items that
+-- aren't closed correctly in the original code. We don't fix tables or
 -- formatting elements (see https://html.spec.whatwg.org/multipage/parsing.html#the-list-of-active-formatting-elements)
 -- as these features don't seem necessary for the purpose of this module. We may change
--- this policy in the future, if it turns out that they are necessary. 
+-- this policy in the future, if it turns out that they are necessary.
 --
 --
 local M = {}
@@ -37,16 +37,16 @@ local xmlns = {
   SVG = "http://www.w3.org/2000/svg",
   XLink = "http://www.w3.org/1999/xlink",
   XML = "http://www.w3.org/XML/1998/namespace",
-  XMLNS = "http://www.w3.org/2000/xmlns/", 
+  XMLNS = "http://www.w3.org/2000/xmlns/",
 }
 
--- we must make search tree for named entities, as their support 
+-- we must make search tree for named entities, as their support
 -- is quite messy
 local named_entities
 if kpse then
   named_entities = require "luaxml-namedentities"
 else
-  named_entities = require "luaxml.namedentities"
+  named_entities = require "citeproc.luaxml.namedentities"
 end
 
 local entity_tree = {children = {}}
@@ -69,10 +69,10 @@ for entity, char in pairs(named_entities) do
   tree.char   = char
 end
 
-local function search_entity_tree(tbl) 
+local function search_entity_tree(tbl)
   -- get named entity for the list of characters
   local tree = entity_tree
-  for _,char in ipairs(tbl) do 
+  for _,char in ipairs(tbl) do
     if tree.children then
       tree = tree.children[char]
       if not tree then return nil end
@@ -112,11 +112,11 @@ function Doctype:init(name, parent)
   local o = {}
   setmetatable(o, self)
   self.__index = self
-  self.__tostring = function (x) 
+  self.__tostring = function (x)
     if x.data then
-      return "<!DOCTYPE " .. x.name .. " " .. x.data ..  ">" 
+      return "<!DOCTYPE " .. x.name .. " " .. x.data ..  ">"
     else
-      return "<!DOCTYPE " .. x.name .. ">" 
+      return "<!DOCTYPE " .. x.name .. ">"
     end
   end
   self.add_child = Root.add_child
@@ -179,9 +179,9 @@ function Element:init(tag, parent)
   else
     o.tag = tag
   end
-  self.__tostring = function(x) 
+  self.__tostring = function(x)
     local attr = {}
-    for _, el in ipairs(x.attr) do 
+    for _, el in ipairs(x.attr) do
       -- handle attributes
       local value
       if el.value:match('"') then
@@ -196,7 +196,7 @@ function Element:init(tag, parent)
       closing = " />"
     end
     if #attr > 0 then
-      return "<" .. x.tag .. " " .. table.concat(attr, " ") .. closing 
+      return "<" .. x.tag .. " " .. table.concat(attr, " ") .. closing
     else
       return "<" .. x.tag .. closing
     end
@@ -241,7 +241,7 @@ local function is_upper_alpha(codepoint)
   end
 end
 local function is_lower_alpha(codepoint)
-  if (96 < codepoint and codepoint < 123) then 
+  if (96 < codepoint and codepoint < 123) then
     return true
   end
 end
@@ -274,11 +274,11 @@ local function is_lower_hex(codepoint)
   end
 end
 
-local function is_hexadecimal(codepoint) 
+local function is_hexadecimal(codepoint)
   if is_numeric(codepoint) or
      is_lower_hex(codepoint) or
      is_upper_hex(codepoint)
-  then 
+  then
     return true
   end
 end
@@ -288,7 +288,7 @@ local function is_alphanumeric(codepoint)
   return is_alpha(codepoint) or is_numeric(codepoint)
 end
 
-local function is_space(codepoint) 
+local function is_space(codepoint)
   -- detect space characters
   if codepoint==0x0009 or codepoint==0x000A or codepoint==0x000C or codepoint==0x0020 then
     return true
@@ -302,33 +302,33 @@ end
 
 
 character_entity_replace_table = {
-[0x80] =  0x20AC,  
-[0x82] =  0x201A,  
-[0x83] =  0x0192,  
-[0x84] =  0x201E,  
-[0x85] =  0x2026,  
-[0x86] =  0x2020,  
-[0x87] =  0x2021,  
-[0x88] =  0x02C6,  
-[0x89] =  0x2030,  
-[0x8A] =  0x0160,  
-[0x8B] =  0x2039,  
-[0x8C] =  0x0152,  
-[0x8E] =  0x017D,  
-[0x91] =  0x2018,  
-[0x92] =  0x2019,  
-[0x93] =  0x201C,  
-[0x94] =  0x201D,  
-[0x95] =  0x2022,  
-[0x96] =  0x2013,  
-[0x97] =  0x2014,  
-[0x98] =  0x02DC,  
-[0x99] =  0x2122,  
-[0x9A] =  0x0161,  
-[0x9B] =  0x203A,  
-[0x9C] =  0x0153,  
-[0x9E] =  0x017E,  
-[0x9F] =  0x0178  
+[0x80] =  0x20AC,
+[0x82] =  0x201A,
+[0x83] =  0x0192,
+[0x84] =  0x201E,
+[0x85] =  0x2026,
+[0x86] =  0x2020,
+[0x87] =  0x2021,
+[0x88] =  0x02C6,
+[0x89] =  0x2030,
+[0x8A] =  0x0160,
+[0x8B] =  0x2039,
+[0x8C] =  0x0152,
+[0x8E] =  0x017D,
+[0x91] =  0x2018,
+[0x92] =  0x2019,
+[0x93] =  0x201C,
+[0x94] =  0x201D,
+[0x95] =  0x2022,
+[0x96] =  0x2013,
+[0x97] =  0x2014,
+[0x98] =  0x02DC,
+[0x99] =  0x2122,
+[0x9A] =  0x0161,
+[0x9B] =  0x203A,
+[0x9C] =  0x0153,
+[0x9E] =  0x017E,
+[0x9F] =  0x0178
 }
 
 local function fix_null(codepoint)
@@ -339,7 +339,7 @@ local function fix_null(codepoint)
   end
 end
 
-HtmlStates.data = function(parser) 
+HtmlStates.data = function(parser)
   -- this is the default state
   local codepoint = parser.codepoint
   -- print("codepoint", parser.codepoint)
@@ -347,10 +347,10 @@ HtmlStates.data = function(parser)
     -- start of tag
     return "tag_open"
   elseif codepoint  == amperesand then
-    -- we must save the current state 
+    -- we must save the current state
     -- what we will return to after entity
     parser.return_state = "data"
-    return "character_reference" 
+    return "character_reference"
   elseif codepoint == EOF then
     parser:emit_eof()
   else
@@ -408,7 +408,7 @@ HtmlStates.character_reference = function(parser)
 end
 
 HtmlStates.named_character_reference = function(parser)
-  -- named entity parsing is pretty complicated 
+  -- named entity parsing is pretty complicated
   -- https://html.spec.whatwg.org/multipage/parsing.html#named-character-reference-state
   local codepoint = parser.codepoint
   -- test if the current entity name is included in the named entity list
@@ -417,7 +417,7 @@ HtmlStates.named_character_reference = function(parser)
   for i=2, #parser.temp_buffer do search_table[#search_table+1] = parser.temp_buffer[i] end
   if codepoint == semicolon then
     -- close named entity
-    local entity = search_entity_tree(search_table) 
+    local entity = search_entity_tree(search_table)
     if entity and entity.char then
       parser:add_entity(entity.char)
     else
@@ -440,7 +440,7 @@ HtmlStates.named_character_reference = function(parser)
       if #search_table > 1 then
         local token = parser.current_token
         if token.type == "start_tag" and (codepoint == equals or is_alphanumeric(codepoint)) then
-          -- in attribute value, flush characters and retokenize  
+          -- in attribute value, flush characters and retokenize
           parser:flush_temp_buffer()
           return parser:tokenize(parser.return_state)
         else
@@ -456,7 +456,7 @@ HtmlStates.named_character_reference = function(parser)
             -- loop over the table with characters, and try to find if it matches entity
             for i = #search_table, 1,-1 do
               local removed_char = table.remove(search_table)
-              -- 
+              --
               table.insert(rest, 1, removed_char)
               newentity = search_entity_tree(search_table)
               if newentity and newentity.char then
@@ -569,16 +569,16 @@ HtmlStates.hexadecimal_character_reference = function(parser)
 end
 
 HtmlStates.numeric_reference_end_state = function(parser)
-  -- in this state, we don't need to 
+  -- in this state, we don't need to
   local character = parser.character_reference_code
   -- we need to clean invalid character codes
-  if character == 0x00 or 
+  if character == 0x00 or
      character >  0x10FFFF or
-     is_surrogate(character) 
+     is_surrogate(character)
   then
     character = 0xFFFD
   -- should we add special support for "noncharacter"? I think we can pass them to the output anyway
-  elseif character_entity_replace_table[character] then 
+  elseif character_entity_replace_table[character] then
     character = character_entity_replace_table[character]
   end
   parser:add_entity(uchar(character))
@@ -906,7 +906,7 @@ HtmlStates.after_doctype_name = function(parser)
     doctype_eof(parser)
   else
     parser:append_token_data("data", uchar(codepoint))
-    -- there are lot of complicated rules how to consume doctype, 
+    -- there are lot of complicated rules how to consume doctype,
     -- but I think that for our purpose they aren't interesting.
     -- so everything until EOF or > is consumed as token.data
     return "consume_doctype_data"
@@ -930,7 +930,7 @@ end
 HtmlStates.tag_name = function(parser)
   local codepoint = parser.codepoint
   codepoint = fix_null(codepoint)
-  if is_space(codepoint) then 
+  if is_space(codepoint) then
     return "before_attribute_name"
   elseif codepoint == solidus then
     return "self_closing_tag"
@@ -982,9 +982,9 @@ end
 
 HtmlStates.attribute_name = function(parser)
   local codepoint = parser.codepoint
-  if is_space(codepoint) 
+  if is_space(codepoint)
      or codepoint == solidus
-     or codepoint == greater_than 
+     or codepoint == greater_than
   then
     return parser:tokenize("after_attribute_name")
   elseif codepoint == equals then
@@ -1020,7 +1020,7 @@ end
 HtmlStates.before_attribute_value = function(parser)
   local codepoint = parser.codepoint
   if is_space(codepoint) then
-    return "before_attribute_value" 
+    return "before_attribute_value"
   elseif codepoint == quoting then
     return "attribute_value_quoting"
   elseif codepoint == apostrophe then
@@ -1084,7 +1084,7 @@ HtmlStates.after_attribute_value_quoting = function(parser)
   elseif codepoint == greater_than then
     parser:emit()
     return "data"
-  else 
+  else
     return parser:tokenize("before_attribute_name")
   end
 end
@@ -1098,10 +1098,10 @@ HtmlStates.rcdata = function(parser)
     -- start of tag
     return "rcdata_less_than"
   elseif codepoint  == amperesand then
-    -- we must save the current state 
+    -- we must save the current state
     -- what we will return to after entity
     parser.return_state = "rcdata"
-    return "character_reference" 
+    return "character_reference"
   elseif codepoint == EOF then
     parser:emit_eof()
   else
@@ -1142,7 +1142,7 @@ end
 HtmlStates.rcdata_end_tag_name = function(parser)
   -- we need to find name of the currently opened tag
   local parent = parser:get_parent() or {}
-  local opened_tag = parent.tag 
+  local opened_tag = parent.tag
   local current_tag = table.concat(parser.current_token.name or {})
   local codepoint = parser.codepoint
   if is_upper_alpha(codepoint) then
@@ -1208,7 +1208,7 @@ end
 HtmlStates.rawtext_end_tag_name = function(parser)
   -- we need to find name of the currently opened tag
   local parent = parser:get_parent() or {}
-  local opened_tag = parent.tag 
+  local opened_tag = parent.tag
   local current_tag = table.concat(parser.current_token.name or {})
   local codepoint = parser.codepoint
   if is_upper_alpha(codepoint) then
@@ -1276,7 +1276,7 @@ end
 HtmlStates.script_data_end_tag_name = function(parser)
   -- we need to find name of the currently opened tag
   local parent = parser:get_parent() or {}
-  local opened_tag = parent.tag 
+  local opened_tag = parent.tag
   local current_tag = table.concat(parser.current_token.name or {})
   local codepoint = parser.codepoint
   if is_upper_alpha(codepoint) then
@@ -1394,7 +1394,7 @@ HtmlStates.script_data_escaped_less_than_sign = function(parser)
   end
 end
 
-HtmlStates.script_data_escaped_end_tag_open = function(parser) 
+HtmlStates.script_data_escaped_end_tag_open = function(parser)
   local codepoint = parser.codepoint
   if is_alpha(codepoint) then
     parser:start_token("end_tag", {name={}})
@@ -1408,7 +1408,7 @@ end
 HtmlStates.script_data_escaped_end_tag_name = function(parser)
   -- we need to find name of the currently opened tag
   local parent = parser:get_parent() or {}
-  local opened_tag = parent.tag 
+  local opened_tag = parent.tag
   local current_tag = table.concat(parser.current_token.name or {})
   local codepoint = parser.codepoint
   if is_upper_alpha(codepoint) then
@@ -1438,8 +1438,8 @@ end
 HtmlStates.script_data_double_escape_start = function(parser)
   local codepoint = parser.codepoint
   if is_alpha(codepoint) or
-     codepoint == solidus or 
-     codepoint == greater_than 
+     codepoint == solidus or
+     codepoint == greater_than
   then
     local current_tag = table.concat(parser.current_token.name or {})
     parser:emit_character(uchar(codepoint))
@@ -1511,8 +1511,8 @@ end
 HtmlStates.script_data_double_escape_end = function(parser)
   local codepoint = parser.codepoint
   if is_alpha(codepoint) or
-     codepoint == solidus or 
-     codepoint == greater_than 
+     codepoint == solidus or
+     codepoint == greater_than
   then
     local current_tag = table.concat(parser.current_token.name or {})
     parser:emit_character(uchar(codepoint))
@@ -1570,8 +1570,8 @@ end
 
 -- these lists are used in HtmlParser:generate_implied_endtags()
 local implied_endtags = {dd=true, dt=true, li = true, optgroup = true, option = true, p = true, rb = true, rp = true, rd = true, trc = true}
-local implied_endtags_thoroughly = {dd=true, dt=true, li = true, optgroup = true, option = true, p = true, 
-      rb = true, rp = true, rd = true, trc = true, caption = true, colgroup = true, tbody = true, td = true, 
+local implied_endtags_thoroughly = {dd=true, dt=true, li = true, optgroup = true, option = true, p = true,
+      rb = true, rp = true, rd = true, trc = true, caption = true, colgroup = true, tbody = true, td = true,
       tfoot = true, th = true, thead = true, tr = true
 }
 
@@ -1579,9 +1579,9 @@ local implied_endtags_thoroughly = {dd=true, dt=true, li = true, optgroup = true
 -- it fails if any element from element_list is matched before that tag
 local function is_in_scope(parser, target, element_list)
   for i = #parser.unfinished, 1, -1 do
-    local node = parser.unfinished[i] 
+    local node = parser.unfinished[i]
     local tag = node.tag
-    if tag == target then 
+    if tag == target then
       return true
     elseif element_list[tag] then
       return false
@@ -1628,9 +1628,9 @@ end
 local function is_in_select_scope(parser, target)
   -- this scope is specific, because it supports all tags except two
   for i = #parser.unfinished, 1, -1 do
-    local node = parser.unfinished[i] 
+    local node = parser.unfinished[i]
     local tag = node.tag
-    if tag == target then 
+    if tag == target then
       return true
     elseif tag == "optgroup" or tag == "option" then
       -- only these two tags are supported
@@ -1643,7 +1643,7 @@ end
 
 -- List of active formatting elements
 -- https://html.spec.whatwg.org/multipage/parsing.html#the-list-of-active-formatting-elements
--- we don't implement it yet, but maybe in the future. 
+-- we don't implement it yet, but maybe in the future.
 
 
 local HtmlTreeStates = {}
@@ -1688,7 +1688,7 @@ end
 -- declare void elements
 local self_closing_tags_list = {"area", "base", "br", "col", "embed", "hr", "img", "input",
     "link", "meta", "param", "source", "track", "wbr"}
- 
+
 local self_closing_tags = {}
 for _,v in ipairs(self_closing_tags_list) do self_closing_tags[v] = true end
 
@@ -1697,7 +1697,7 @@ for _,v in ipairs(self_closing_tags_list) do self_closing_tags[v] = true end
 --- Execute the HTML parser
 --- @return table Root node of the HTML DOM
 function HtmlParser:parse()
-  -- we assume utf8 input, you must convert it yourself if the source is 
+  -- we assume utf8 input, you must convert it yourself if the source is
   -- in a different encoding. for example using luaxml-encodings library
   self.text = {}
   self.state = self.default_state
@@ -1885,8 +1885,8 @@ function HtmlParser:set_xmlns(node, parent)
     end
   end
   if not in_attr then
-    -- if we cannot find xmlns attribute, then use 
-    --  xmlns from the parent element, or the default xmlns 
+    -- if we cannot find xmlns attribute, then use
+    --  xmlns from the parent element, or the default xmlns
     local parent = self:get_parent()
     node.xmlns = parent.xmlns or xmlns.HTML
   end
@@ -1969,7 +1969,7 @@ function HtmlParser:handle_insertion_mode(token)
       if close_p_at_start[name] then close_paragraph(self) end
       if close_headers[name] then
         close_paragraph(self)
-        -- close current element if it is already header 
+        -- close current element if it is already header
         if close_headers[self:current_element_name()] then
           self:pop_element()
         end
@@ -2005,9 +2005,9 @@ function HtmlParser:handle_insertion_mode(token)
       elseif close_headers[name] then
         local header_in_scope = false
         -- detect, if there are any open h1-h6 tag and close it
-        for el, _ in pairs(close_headers) do 
+        for el, _ in pairs(close_headers) do
           if is_in_scope(self, el, {}) then
-            header_in_scope = el 
+            header_in_scope = el
             break
           end
         end
@@ -2047,10 +2047,10 @@ function HtmlParser:start_tag()
       -- add to the unfinished list
       table.insert(self.unfinished, node)
     end
-    if name == "title" then 
-      self.element_state = "rcdata" 
+    if name == "title" then
+      self.element_state = "rcdata"
     elseif rawtext_elements[name] then
-      self.element_state = "rawtext" 
+      self.element_state = "rawtext"
     elseif name == "script" then
       self.element_state = "script_data"
     end
@@ -2153,13 +2153,13 @@ function HtmlParser:reset_insertion_mode()
       if not last then
         for x = position -1, 1, -1 do
           if x == 1 then break end
-          local ancestor = self.unfinished[x] 
+          local ancestor = self.unfinished[x]
           local ancestor_name = ancestor.tag
           if ancestor_name == "template" then
             break
           elseif ancestor_name == "table" then
             self:switch_insertion("in_select_in_table")
-            return 
+            return
           end
         end
       end
@@ -2210,7 +2210,7 @@ function HtmlParser:finish()
   return self.Document -- self:close_element()
 end
 
--- 
+--
 M.Text       = Text
 M.Element    = Element
 M.HtmlParser = HtmlParser
@@ -2223,4 +2223,4 @@ M.is_in_button_scope = is_in_button_scope
 M.is_in_table_scope = is_in_table_scope
 M.is_in_select_scope = is_in_select_scope
 
-return M 
+return M

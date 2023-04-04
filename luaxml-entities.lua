@@ -4,7 +4,7 @@ local named_entities
 if kpse then
   named_entities = require "luaxml-namedentities"
 else
-  named_entities = require "luaxml.namedentities"
+  named_entities = require "citeproc.luaxml.namedentities"
 end
 local hexchartable = {}
 local decchartable = {}

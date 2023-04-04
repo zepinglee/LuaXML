@@ -13,10 +13,10 @@ if kpse then
   css_query = require("luaxml-cssquery")
   html = require("luaxml-mod-html")
 else
-  xml = require("luaxml.mod-xml")
-  handler = require("luaxml.mod-handler")
-  css_query = require("luaxml.cssquery")
-  html = require("luaxml.mod-html")
+  xml = require("citeproc.luaxml.mod-xml")
+  handler = require("citeproc.luaxml.mod-handler")
+  css_query = require("citeproc.luaxml.cssquery")
+  html = require("citeproc.luaxml.mod-html")
 end
 
 local HtmlParser = html.HtmlParser
@@ -64,7 +64,7 @@ local actions = {
   PI = {start = "<?%s %s?>"},
   DTD = {start = "<!DOCTYPE ", text = "%s" , stop=">"},
   CDATA = {start = "<![CDATA[", text = "%s", stop ="]]>"}
-  
+
 }
 
 --- It serializes the DOM object back to the XML.
@@ -72,7 +72,7 @@ local actions = {
 -- use the `DOM_Object:serialize()`.
 -- @param parser DOM object
 -- @param current Element which should be serialized
--- @param level 
+-- @param level
 -- @param output
 -- @return table Table with XML strings. It can be concenated using table.concat() function to get XML string corresponding to the DOM_Object.
 local function serialize_dom(parser, current,level, output)
@@ -157,7 +157,7 @@ local function serialize_dom(parser, current,level, output)
   end
 
   start(xtype, name, attributes)
-  text(xtype,text_content, (current or {})._parent) 
+  text(xtype,text_content, (current or {})._parent)
   local children = root._children or {}
   for _, child in ipairs(children) do
     output = serialize_dom(parser,child, level + 1, output)
@@ -196,8 +196,8 @@ parse = function(
   end
   local parser = setmetatable({}, DOM_Object)
 
-  --- Returns root element of the DOM_Object 
-  -- @return DOM_Object 
+  --- Returns root element of the DOM_Object
+  -- @return DOM_Object
   function DOM_Object:root_node()
     return self._handler.root
   end
@@ -205,7 +205,7 @@ parse = function(
 
   --- Get current node type
   -- @param  el [optional] node to get the type of
-  function DOM_Object:get_node_type( 
+  function DOM_Object:get_node_type(
     el --- [optional] element to test
     )
     local el = el or self
@@ -222,7 +222,7 @@ parse = function(
     return self:get_node_type(el) == "ELEMENT" -- @bool
   end
 
-  
+
   --- Test if current node is text
   -- @return boolean
   function DOM_Object:is_text(
@@ -257,7 +257,7 @@ parse = function(
 
   --- Set value of an attribute
   -- @return boolean
-  function DOM_Object:set_attribute( 
+  function DOM_Object:set_attribute(
     name --- Attribute name
     , value --- Value to be set
     )
@@ -268,7 +268,7 @@ parse = function(
       return true
     end
   end
-  
+
 
   --- Serialize the current node back to XML
   -- @return string
@@ -316,7 +316,7 @@ parse = function(
     )
     local function traverse_path(path_elements, current, t)
       local t = t or {}
-      if #path_elements == 0 then 
+      if #path_elements == 0 then
         -- for _, x in ipairs(current._children or {}) do
           -- table.insert(t,x)
         -- end
@@ -363,7 +363,7 @@ parse = function(
 
   --- Get the parent element
   -- @return DOM_Object parent element
-  function DOM_Object:get_parent( 
+  function DOM_Object:get_parent(
     el --- [optional] element to be selected
     )
     local el = el or self
@@ -371,7 +371,7 @@ parse = function(
   end
 
   --- Execute function on the current element and all it's children nodes.
-  -- The difference to DOM_Object:traverse_elements() is that it executes the function 
+  -- The difference to DOM_Object:traverse_elements() is that it executes the function
   -- also on text nodes and all other kinds of XML nodes.
   -- The traversing of child elements of a given node can be disabled when the executed
   -- function returns false.
@@ -382,7 +382,7 @@ parse = function(
     local current = current or self --
     -- Following situation may happen when this method is called directly on the parsed object
     if not current:get_node_type() then
-      current = self:root_node() 
+      current = self:root_node()
     end
     local status = true
     local status = fn(current)
@@ -412,7 +412,7 @@ parse = function(
     end)
   end
 
-  --- Get table with the inner text of an element, every text node is a separate table item. 
+  --- Get table with the inner text of an element, every text node is a separate table item.
   --- @return table
   function DOM_Object:strings(
     current --- [optional] element to be selected
@@ -428,7 +428,7 @@ parse = function(
   end
 
   --- Get table with the inner text of an element - leading and trailing spaces are removed and elements that contain only white space are ignored.
-  --  @return table 
+  --  @return table
   function DOM_Object:stripped_strings(
     current --- [optional] element to be selected
     )
@@ -448,7 +448,7 @@ parse = function(
 
 
   --- Execute function on list of elements returned by DOM_Object:get_path()
-  function DOM_Object:traverse_node_list( 
+  function DOM_Object:traverse_node_list(
     nodelist --- table with nodes selected by DOM_Object:get_path()
     , fn --- function to be executed
     )
@@ -487,7 +487,7 @@ parse = function(
 
 
   --- Add child node to the current node
-  function DOM_Object:add_child_node( 
+  function DOM_Object:add_child_node(
     child, --- element to be inserted as a current node child
     position --- [optional] position at which should the node be inserted
     )
@@ -504,7 +504,7 @@ parse = function(
 
   --- Create copy of the current node
   -- @return DOM_Object element
-  function DOM_Object:copy_node( 
+  function DOM_Object:copy_node(
     element --- [optional] element to be copied
     )
     local element = element or self
@@ -541,7 +541,7 @@ parse = function(
 
   --- Create new text node
   -- @return DOM_Object text object
-  function DOM_Object:create_text_node( 
+  function DOM_Object:create_text_node(
     text, -- string
     parent -- [optional] element which should be saved as the element's parent
     )
@@ -562,8 +562,8 @@ parse = function(
     local parent = self:get_parent(element)
     local pos = self:find_element_pos(element)
     -- if pos then table.remove(parent._children, pos) end
-    if pos then 
-      -- table.remove(parent._children, pos) 
+    if pos then
+      -- table.remove(parent._children, pos)
       parent._children[pos] = setmetatable({_type = "removed"}, DOM_Object)
     end
   end
@@ -630,7 +630,7 @@ parse = function(
     str,
     is_xml
     )
-    -- <> is a dummy element, we just need to wrap everything in some element 
+    -- <> is a dummy element, we just need to wrap everything in some element
     str = "<>" .. (str or "") .. "</>"
     local template = is_xml and parse(str) or parse(str)
     local root = template:root_node()._children[1]
@@ -655,7 +655,7 @@ parse = function(
     str, --- HTML or XML to be inserted
     is_xml --- [optional] Pass true to parse as XML, otherwise parse as HTML
   )
-    local el = self 
+    local el = self
     local root = self:create_template(str, is_xml)
     local parent = el:get_parent()
     local current_pos = el:find_element_pos()
@@ -670,7 +670,7 @@ parse = function(
     str, --- HTML or XML to be inserted
     is_xml --- [optional] Pass true to parse as XML, otherwise parse as HTML
   )
-    local el = self 
+    local el = self
     local root = self:create_template(str, is_xml)
     local children = root:get_children()
     for i = 1,  #children do
@@ -683,7 +683,7 @@ parse = function(
     str, --- HTML or XML to be inserted
     is_xml --- [optional] Pass true to parse as XML, otherwise parse as HTML
   )
-    local el = self 
+    local el = self
     local root = self:create_template(str, is_xml)
     local children = root:get_children()
     for i = 1,  #children do
@@ -731,8 +731,8 @@ function html_to_dom(html_object)
   end
 
   local function build_tree(object)
-    -- convert tree produced by the HTML parser to LuaXML DOM 
-    local typ = object._type 
+    -- convert tree produced by the HTML parser to LuaXML DOM
+    local typ = object._type
     -- process particular node types from the HTML parser
     if typ == "doctype" then
       current_parent:add_child_node(create_node {_name=object.name, _type="DTD"})
@@ -741,7 +741,7 @@ function html_to_dom(html_object)
     elseif typ == "element" then
       local attributes = {}
       -- convert attributes to the form expected by the DOM object
-      for _, attr in ipairs(object.attr) do 
+      for _, attr in ipairs(object.attr) do
         attributes[attr.name] = attr.value
       end
       local element = current_parent:create_element(object.tag, attributes)
@@ -786,7 +786,7 @@ end
 
 --- @export
 return {
-  parse = parse, 
+  parse = parse,
   serialize_dom= serialize_dom,
   html_parse = html_parse
 }

@@ -10,8 +10,8 @@ if kpse then
   domobject = require "luaxml-domobject"
   cssquery = require "luaxml-cssquery"
 else
-  domobject = require "luaxml.domobject"
-  cssquery = require "luaxml.cssquery"
+  domobject = require "citeproc.luaxml.domobject"
+  cssquery = require "citeproc.luaxml.cssquery"
 end
 -- initialize CSS selector object
 local css = cssquery()
@@ -66,7 +66,7 @@ local function process_text(text, parameters)
   if parameters.collapse_newlines==true then
     text = text:gsub("\n", " ")
   end
-  -- verbatim can be set in parameters table. it prevent collapsing of spaces. 
+  -- verbatim can be set in parameters table. it prevent collapsing of spaces.
   if not verbatim then
     text = text:gsub("(%s%s+)", function(a) return a:sub(1,1) end)
   end
@@ -117,10 +117,10 @@ end
 -- @param count Number of child element that should be returned
 -- @return DOM object, or nil if it cannot be found
 local function get_child_element(element, count)
-  -- return specified child element 
+  -- return specified child element
   local i = 0
   for _, el in ipairs(element:get_children()) do
-    -- count elements 
+    -- count elements
     if el:is_element() then
       -- return the desired numbered element
       i = i + 1
@@ -147,7 +147,7 @@ local function simple_content(s,parameters)
     -- process child elements
     expanded = expanded:gsub("@<(.-)>",function(name)
       -- @<.> return element's content
-      if name == "." then 
+      if name == "." then
         return content
       -- @<1> returns first child element's content
       elseif name:match("^[0-9]+$") then
@@ -166,7 +166,7 @@ local function simple_content(s,parameters)
         return table.concat(t, separator)
       end
     end)
-     
+
     return expanded:gsub("%%s", function(a) return content end)
   end
 end
@@ -175,7 +175,7 @@ end
 
 -- actions for particular elements
 local actions = {
-  
+
 }
 
 --- Use function to transform selected element
@@ -229,7 +229,7 @@ local function load_file(filename)
   return parse_xml(content)
 end
 
---- Transform XML DOM object 
+--- Transform XML DOM object
 -- @param dom DOM object
 -- @return transformed string
 local function process_dom(dom)
@@ -237,7 +237,7 @@ local function process_dom(dom)
 end
 
 --- print transformed file to PDF using LuaTeX functions
--- @param content String to be printed 
+-- @param content String to be printed
 local function print_tex(content)
   -- we need to replace "\n" characters with calls to tex.sprint
   for s in content:gmatch("([^\n]*)") do
@@ -247,7 +247,7 @@ end
 
 
 -- make Transformer object
-local Transformer 
+local Transformer
 
 --- Make new Transformer object
 -- @return Transformer object
@@ -297,12 +297,12 @@ function Transformer:add_custom_action(selector, fn )
 end
 
 --- Remove all actions that match the given selector
----@param selector string 
+---@param selector string
 function Transformer:reset_actions(selector)
   reset_actions(selector, self.css)
 end
 
--- all methods that use transformation functions must 
+-- all methods that use transformation functions must
 -- correctly handle the cssquery object that this library uses
 
 --- Parse XML string
@@ -331,7 +331,7 @@ end
 
 -- make method for process_dom function
 
---- Transform XML DOM object 
+--- Transform XML DOM object
 -- @param dom DOM object
 -- @return transformed string
 -- @see process_dom
@@ -341,7 +341,7 @@ function Transformer:process_dom(dom)
   self:restore_css()
   return result
 end
-  
+
 
 --- @export
 local M = {

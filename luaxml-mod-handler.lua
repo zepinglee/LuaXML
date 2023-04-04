@@ -119,8 +119,8 @@ if kpse then
     stack = require("luaxml-stack")
     entities = require("luaxml-entities")
 else
-    stack = require("luaxml.stack")
-    entities = require("luaxml.entities")
+    stack = require("citeproc.luaxml.stack")
+    entities = require("citeproc.luaxml.entities")
 end
 
 local function showTable(t)

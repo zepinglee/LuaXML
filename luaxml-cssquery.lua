@@ -5,7 +5,7 @@ local parse_query
 if kpse then
   parse_query = require("luaxml-parse-query")
 else
-  parse_query = require("luaxml.parse-query")
+  parse_query = require("citeproc.luaxml.parse-query")
 end
 
 -- the string.explode function is provided by LuaTeX

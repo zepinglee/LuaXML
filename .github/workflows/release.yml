@@ -35,7 +35,7 @@ jobs:
         run: echo version=$(lua .github/semver.lua ${{ github.ref_name }}) >> $GITHUB_OUTPUT
 
       - name: Make rockspec of new version
-        run: luarocks new_version --tag ${{ github.ref_name }} rockspecs/lzp-luaxml-dev-1.rockspec ${{ steps.semver.outputs.version }}
+        run: luarocks new_version --tag ${{ github.ref_name }} rockspecs/lzp-luaxml-dev-1.rockspec
 
       - name: Upload to LuaRocks
-        run: luarocks upload --temp-key ${{ secrets.LUAROCKS_API_KEY }} lzp-luaxml-${{ steps.semver.outputs.version }}-1.rockspec
+        run: luarocks upload --temp-key ${{ secrets.LUAROCKS_API_KEY }} lzp-luaxml-${{ github.ref_name }}-1.rockspec

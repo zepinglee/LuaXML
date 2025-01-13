@@ -27,6 +27,9 @@ jobs:
       - name: Set up dependencies
         run: luarocks install dkjson
 
+      - name: Make entities module
+        run: luaxml-namedentities.lua
+
       - name: Parse semantic version
         id: semver
         run: echo version=$(lua .github/semver.lua ${{ github.ref_name }}) >> $GITHUB_OUTPUT

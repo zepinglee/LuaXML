@@ -30,5 +30,8 @@ jobs:
       - name: Set up dependencies
         run: luarocks install dkjson
 
+      - name: Make entities module
+        run: luaxml-namedentities.lua
+
       - name: Upload dev version to LuaRocks
         run: luarocks upload --temp-key ${{ secrets.LUAROCKS_API_KEY }} --force rockspecs/lzp-luaxml-dev-1.rockspec

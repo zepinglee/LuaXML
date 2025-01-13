@@ -3,7 +3,7 @@ name: Release dev version
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - rockspecs/lzp-luaxml-dev-1.rockspec
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
         run: luarocks install dkjson
 
       - name: Make entities module
-        run: luaxml-namedentities.lua
+        run: make luaxml-namedentities.lua
 
       - name: Upload dev version to LuaRocks
         run: luarocks upload --temp-key ${{ secrets.LUAROCKS_API_KEY }} --force rockspecs/lzp-luaxml-dev-1.rockspec

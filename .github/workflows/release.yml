@@ -28,7 +28,7 @@ jobs:
         run: luarocks install dkjson
 
       - name: Make entities module
-        run: luaxml-namedentities.lua
+        run: make luaxml-namedentities.lua
 
       - name: Parse semantic version
         id: semver

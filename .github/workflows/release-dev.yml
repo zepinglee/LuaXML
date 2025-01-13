@@ -1,0 +1,34 @@
+name: Release dev version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - rockspecs/lzp-luaxml-dev-1.rockspec
+  workflow_dispatch:
+
+jobs:
+
+  publish-luarocks-dev:
+    if: ${{ github.repository == 'zepinglee/LuaXML' }}
+    name: Publish dev version to LuaRocks
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.3"
+
+      - name: Set up LuaRocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: Set up dependencies
+        run: luarocks install dkjson
+
+      - name: Upload dev version to LuaRocks
+        run: luarocks upload --temp-key ${{ secrets.LUAROCKS_API_KEY }} --force rockspecs/lzp-luaxml-dev-1.rockspec
